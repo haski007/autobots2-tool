@@ -21,7 +21,6 @@
   },
   "dependencies": {
     "mongodb": "^3.0.10",
-    "node-config-files": "^1.0.0",
     "request": "^2.87.0",
     "request-debug": "^0.2.0",
     "steam-client": "^2.5.7",

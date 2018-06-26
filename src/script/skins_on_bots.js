@@ -8,14 +8,14 @@ main().catch(console.error)
 async function main() {
   
   const lineReader = readline.createInterface({ input: fs.createReadStream(config.skinsOnBots.inputFile) })
-  const ids = []
-  lineReader.on('line', line => ids.push(line.replace(/[\"\'\,]/g, '').trim()))
+  const logins = []
+  lineReader.on('line', line => logins.push(line.replace(/[\"\'\,]/g, '').trim()))
   lineReader.on('close', async () => {
   
     const mongo = new Mongo({})
     await mongo.getDb()
   
-    const bots = await mongo.find('bots', { login: { $in: ids }})
+    const bots = await mongo.find('bots', { login: { $in: logins }})
     const skins = await mongo.find('skins', { _bot: { $in: bots.map(b => Mongo.objectId(b._id))} })
   
     await mongo.close()
