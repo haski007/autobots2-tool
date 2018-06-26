@@ -13,6 +13,8 @@ async function main() {
   console.log('To fix skins without _trade field execute:\tnpm run fixSkinTrade')
   console.log('To remove failed rules execute:\tnpm run removeFailedRules')
   console.log('To get list of skins on certain bots execute:\tnpm run skinsOnBots')
+  console.log('To disable bots in list execute:\tnpm run disableBots')
+  console.log('To enable bots not in list execute:\tnpm run enableBots')
   console.log('To move available skins from list to application:\tnpm run tradeSkinsToApp')
 
 }

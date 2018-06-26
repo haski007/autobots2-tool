@@ -22,6 +22,12 @@ const config = {
   skinsOnBots: {
     inputFile: './input/bots.csv'
   },
+  disableBots: {
+    inputFile: './input/bots.csv'
+  },
+  enableBots: {
+    inputFile: './input/bots.csv'
+  },
   tradeSkinsToApp: {
     apiToken: '',
     inputFile: './input/skins_to_app.csv',
