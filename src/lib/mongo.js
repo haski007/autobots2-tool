@@ -45,7 +45,7 @@ export default class Mongo {
   }
   
   static objectIdFromDate(timestamp = Date.now()) {
-    return ObjectID(Math.floor(timestamp / 1000).toString(16) + '0000000000000000')
+    return mongo.ObjectID(Math.floor(timestamp / 1000).toString(16) + '0000000000000000')
   }
   
 }

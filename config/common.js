@@ -33,7 +33,10 @@ const config = {
     inputFile: './input/skins_to_app.csv',
     fromApp: '',
     toApp: ''
-  }
+  },
+  steamLevel: {
+    inputFile: './input/steam_ids.csv'
+  },
 };
 
 module.exports = config;
