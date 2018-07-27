@@ -71,8 +71,9 @@ export default class Steam {
   
   static findExportTradeOfferByAsset(offers, assetid) {
     return offers['trade_offers_sent'].concat(offers['trade_offers_received']).find(offer =>
+        offer &&
         offer.items_to_give &&
-        offer.trade_offer_state === 3
+        (offer.trade_offer_state === 3 || offer.trade_offer_state === 8 && offer.tradeid)
         && offer.items_to_give.some(asset => asset.assetid === assetid)
     )
   }

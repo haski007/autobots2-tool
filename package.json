@@ -12,7 +12,7 @@
     "help": "./node_modules/.bin/babel-node src/script/index.js",
     "failWaitingTrades": "./node_modules/.bin/babel-node src/script/fail_waiting_trades.js",
     "fixSkinMismatch": "./node_modules/.bin/babel-node src/script/fix_skin_mismatch.js",
-    "fixSkinTrade": "./node_modules/.bin/babel-node src/script/fixSkinTrade.js",
+    "fixSkinTrade": "./node_modules/.bin/babel-node src/script/fix_skin_trade.js",
     "removeFailedRules": "./node_modules/.bin/babel-node src/script/remove_failed_rules.js",
     "skinsOnBots": "./node_modules/.bin/babel-node src/script/skins_on_bots.js",
     "disableBots": "./node_modules/.bin/babel-node src/script/disable_bots.js",
