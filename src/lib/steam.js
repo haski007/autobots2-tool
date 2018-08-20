@@ -1,5 +1,6 @@
 import steamIdConvertor from 'steam-id-convertor'
 import request from 'request'
+import Common from "./common"
 
 const APP_IDS = [ 440, 570, 730 ]
 
@@ -23,7 +24,11 @@ export default class Steam {
     return new Promise(async (resolve, reject) => {
       let skins = []
       for (const appId of appIds)
-        skins = skins.concat(await Steam.getGameInventory(steamId, appId).catch(reject))
+        skins = skins.concat(await Steam.getGameInventory(steamId, appId).catch(async (e) => {
+          console.error('Error', e)
+          Common.sleep(10000)
+          return await Steam.getInventory(steamId, appIds)
+        }))
       resolve(skins)
     })
   }
@@ -70,10 +75,14 @@ export default class Steam {
   }
   
   static findExportTradeOfferByAsset(offers, assetid) {
-    return offers['trade_offers_sent'].concat(offers['trade_offers_received']).find(offer =>
+    const arr = []
+    if (offers['trade_offers_sent']) arr.concat(offers['trade_offers_sent'])
+    if (offers['trade_offers_received']) arr.concat(offers['trade_offers_received'])
+    
+    return arr.find(offer =>
         offer &&
         offer.items_to_give &&
-        (offer.trade_offer_state === 3 || offer.trade_offer_state === 8 && offer.tradeid)
+        (offer.trade_offer_state === 3 || offer.trade_offer_state !== 3 && offer.tradeid)
         && offer.items_to_give.some(asset => asset.assetid === assetid)
     )
   }

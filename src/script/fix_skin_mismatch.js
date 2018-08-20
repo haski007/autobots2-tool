@@ -11,7 +11,6 @@ async function main() {
   
   const bots = await mongo.find('bots', { _application: Mongo.objectId(config.fixSkinMismatch.application) })
   
-  const result = {}
   for (const bot of bots) {
     console.log('Processing bot:', bot.login)
     const inventory = await Steam.getInventory(bot.steamId).catch(console.error)
@@ -19,40 +18,48 @@ async function main() {
     
     const offers = await Steam.getTradeOffers(bot.apiKey).catch(console.error)
     
-    const missingLocaly = []
-    const missingOnSteam = []
+    const missingLocaly = {}
+    const missingOnSteam = {}
     
     for (const asset of inventory) {
       if (!asset) continue
-      if (!skins.find(skin => skin.assetid === asset.assetid)) missingLocaly.push({
+      if (!skins.find(skin => skin.assetid === asset.assetid)) missingLocaly[asset.assetid] = {
         appid: asset.appid,
         assetid: asset.assetid
-      })
+      }
+    }
   
-      for (const skin of skins) if (!inventory.find(asset => asset.assetid && asset.assetid === skin.assetid)) {
-        const offer = await Steam.findExportTradeOfferByAsset(offers, skin.assetid)
-        missingOnSteam.push({ appid: skin.appid, assetid: skin.assetid, offer })
-        if (offer && offer.trade_offer_state === 8) console.log('Rolled back:', offer.tradeofferid, skin.assetid)
-        for (const missingSkin of missingOnSteam) {
-          const { assetid, offer } = missingSkin
-          if (offer) {
-            const steamId = Steam.partnerToSteamId(offer.accountid_other)
-            const recipient = await mongo.find('bots', { steamId }).catch(console.error)
-            const login = recipient.login
-            if (!login && steamId && offer.trade_offer_state === 3) {
-              console.log('Updated:', offer.tradeofferid, assetid)
-              await mongo.update('skins', { assetid }, {
-                $set: { _organization: null, _application: null, _bot: null, foreignBotSteamId: steamId }
-              })
-            }
-          }
+    for (const skin of skins) {
+      if (!skin) continue
+      if (!inventory.find(asset => asset.assetid && asset.assetid === skin.assetid)) {
+        if (!missingOnSteam[skin.assetid]) missingOnSteam[skin.assetid] = {
+          appid: skin.appid,
+          assetid: skin.assetid
+        }
+        if (!missingOnSteam[skin.assetid].offer) {
+          const offer = await Steam.findExportTradeOfferByAsset(offers, skin.assetid)
+          missingOnSteam[skin.assetid].offer = offer || 'not_found'
         }
       }
     }
-    result[bot.steamId] = { missingLocaly, missingOnSteam }
-
-    if (missingLocaly.length || missingOnSteam.length)
-      console.log(`app: ${bot._application}, bot: ${bot.login}(${bot.steamId}),`, 'not on Steam:', missingOnSteam.length, 'not in Mongo:', missingLocaly.length)
+  
+    for (const assetid in missingOnSteam) {
+      if (!missingOnSteam[assetid]) continue
+      const offer = missingOnSteam[assetid].offer
+      if (offer && offer !== 'not_found') {
+        const steamId = Steam.partnerToSteamId(offer.accountid_other)
+        const recipient = await mongo.find('bots', { steamId }).catch(console.error)
+        const login = recipient.login
+        if (offer && offer.trade_offer_state !== 3)
+          console.log('Rolled back:', assetid, offer.tradeofferid, offer.trade_offer_state)
+        if (!login && steamId && offer.trade_offer_state === 3) {
+          console.log('Updated:', assetid, offer.tradeofferid)
+          await mongo.update('skins', { assetid }, {
+            $set: { _organization: null, _application: null, _bot: null, foreignBotSteamId: steamId }
+          })
+        }
+      }
+    }
   }
   
   await mongo.close()
