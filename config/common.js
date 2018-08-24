@@ -28,6 +28,11 @@ const config = {
   enableBots: {
     inputFile: './input/bots.csv'
   },
+  processRules: {
+    apiToken: '',
+    fromApp: '',
+    toApp: ''
+  },
   tradeSkinsToApp: {
     apiToken: '',
     inputFile: './input/skins_to_app.csv',

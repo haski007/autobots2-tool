@@ -19,7 +19,7 @@
     "enableBots": "./node_modules/.bin/babel-node src/script/enable_bots.js",
     "tradeSkinsToApp": "./node_modules/.bin/babel-node src/script/trade_skins_to_app.js",
     "steamLevel": "./node_modules/.bin/babel-node src/script/steam_level.js",
-    "addUid": "./node_modules/.bin/babel-node src/script/add_uid.js"
+    "processRules": "./node_modules/.bin/babel-node src/script/process_rules.js"
   },
   "dependencies": {
     "mongodb": "^3.0.10",

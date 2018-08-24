@@ -10,7 +10,7 @@ async function main() {
   await mongo.getDb()
   
   const bots = await mongo.find('bots', { _application: Mongo.objectId(config.fixSkinMismatch.application) })
-  
+
   for (const bot of bots) {
     console.log('Processing bot:', bot.login)
     const inventory = await Steam.getInventory(bot.steamId).catch(console.error)
@@ -37,7 +37,7 @@ async function main() {
           assetid: skin.assetid
         }
         if (!missingOnSteam[skin.assetid].offer) {
-          const offer = await Steam.findExportTradeOfferByAsset(offers, skin.assetid)
+          const offer = await Steam.findTradeOfferByAsset(offers, skin.assetid)
           missingOnSteam[skin.assetid].offer = offer || 'not_found'
         }
       }

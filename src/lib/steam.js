@@ -74,16 +74,13 @@ export default class Steam {
     })
   }
   
-  static findExportTradeOfferByAsset(offers, assetid) {
-    const arr = []
-    if (offers['trade_offers_sent']) arr.concat(offers['trade_offers_sent'])
-    if (offers['trade_offers_received']) arr.concat(offers['trade_offers_received'])
-    
+  static findTradeOfferByAsset(offers, assetid) {
+    let arr = []
+    if (offers['trade_offers_sent']) arr = arr.concat(offers['trade_offers_sent'])
+    if (offers['trade_offers_received']) arr = arr.concat(offers['trade_offers_received'])
+ 
     return arr.find(offer =>
-        offer &&
-        offer.items_to_give &&
-        (offer.trade_offer_state === 3 || offer.trade_offer_state !== 3 && offer.tradeid)
-        && offer.items_to_give.some(asset => asset.assetid === assetid)
+        offer && offer.items_to_give && offer.items_to_give.some(asset => asset.assetid === assetid)
     )
   }
   
