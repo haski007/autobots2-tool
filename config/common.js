@@ -42,6 +42,10 @@ const config = {
   steamLevel: {
     inputFile: './input/steam_ids.csv'
   },
+  reloginOld: {
+    pattern: '',
+    apiToken: ''
+  }
 };
 
 module.exports = config;

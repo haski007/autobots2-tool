@@ -42,8 +42,13 @@ async function main() {
         }
       }
     }
+    
+    for (const assetid in missingLocaly) {
+      console.log('Missing localy', assetid)
+    }
   
     for (const assetid in missingOnSteam) {
+      console.log('Missing on Steam', missingOnSteam[assetid].appid, assetid)
       if (!missingOnSteam[assetid]) continue
       const offer = missingOnSteam[assetid].offer
       if (offer && offer !== 'not_found') {
