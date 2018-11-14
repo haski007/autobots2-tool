@@ -46,7 +46,7 @@ async function main() {
             console.log('Item not found:', item.new_assetid)
           } else {
             console.log('Item updated:', item.new_assetid)
-            await mongo.update('skins', { assetid: item.new_assetid }, {
+            await mongo.update('skins', { appid: item.appid, assetid: item.new_assetid }, {
               $set: { _trade: trade._id }, $addToSet: {
                 points: {
                   assetid: item.assetid,

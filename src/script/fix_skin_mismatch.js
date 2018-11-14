@@ -1,6 +1,7 @@
 import Mongo from '../lib/mongo'
 import Steam from '../lib/steam'
 import config from '../../config/common'
+import Common from "../lib/common"
 
 main().catch(console.error)
 
@@ -65,6 +66,7 @@ async function main() {
         }
       }
     }
+    await Common.sleep(5000)
   }
   
   await mongo.close()

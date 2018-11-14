@@ -4,12 +4,25 @@ import config from '../../config/common'
 export default class Mongo {
   
   constructor({ connectionUrl, dbName }) {
-    this.connectionUrl = connectionUrl || `mongodb://${config.mongo.host}:${config.mongo.port}` || 'mongodb://127.0.0.1:27017'
     this.dbName = dbName || config.mongo.db || 'main'
+    if (connectionUrl)
+      this.connectionUrl = connectionUrl
+    else if (config.mongo.url)
+      this.connectionUrl = config.mongo.url
+    else {
+      this.connectionUrl = 'mongodb://'
+      if (config.mongo.user && config.mongo.password)
+        this.connectionUrl += `${config.mongo.user}:${config.mongo.password}@`
+      if (config.mongo.host && config.mongo.port)
+        this.connectionUrl += `${config.mongo.host}:${config.mongo.port}/${this.dbName}`
+      if (config.mongo.authDb)
+        this.connectionUrl += `?authSource=${config.mongo.authDb}`
+    }
   }
   
   async getClient() {
     if (!this.client)
+      console.log('Connecting to MongoDB with URL:', this.connectionUrl)
       this.client = await mongo.MongoClient.connect(this.connectionUrl)
       .catch(e => console.error('Create MongoDB client error:', e))
     return this.client

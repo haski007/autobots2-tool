@@ -23,12 +23,14 @@ export default class Steam {
   static async getInventory(steamId, appIds = APP_IDS) {
     return new Promise(async (resolve) => {
       let skins = []
-      for (const appId of appIds)
+      for (const appId of appIds) {
         skins = skins.concat(await Steam.getGameInventory(steamId, appId).catch(async (e) => {
           console.error('Error', e)
-          Common.sleep(10000)
+          await Common.sleep(10000)
           return await Steam.getInventory(steamId, appIds)
         }))
+        await Common.sleep(200)
+      }
       resolve(skins)
     })
   }
