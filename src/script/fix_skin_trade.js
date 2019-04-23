@@ -10,23 +10,28 @@ async function main() {
   const mongo = new Mongo({})
   await mongo.getDb()
   
-  const skins = await mongo.find('skins', { _trade: { $exists: false }, _application: Mongo.objectId(config.fixSkinTrade.application) })
+  const skins = await mongo.find('skins', {
+    _trade: { $exists: false }, _application: Mongo.objectId(config.fixSkinTrade.application)
+  })
   
   const skinBotMap = {}
   for (const skin of skins) {
     if (!skinBotMap[skin._bot]) skinBotMap[skin._bot] = []
     skinBotMap[skin._bot].push(skin)
   }
-  
+
   const tradesToCheck = []
   for (const bot in skinBotMap) {
-    const trades = await mongo.find('trades', { _bot: Mongo.objectId(bot), state: 3, itemsToReceive: { $gt: []} })
+    console.log(typeof bot)
+    const trades = await mongo.find('trades', {
+      _bot: Mongo.objectId(bot), state: 3, itemsToReceive: { $gt: []}
+    })
     for (const trade of trades) {
-      const tradeSkins = await mongo.find('skins', { _tradeIds: { $in: [ trade._id ] } })
+      const tradeSkins = await mongo.count('skins', { _tradeIds: { $in: [ trade._id ] } })
       if (trade.itemsToReceive.length !== tradeSkins.length) tradesToCheck.push(trade)
     }
   }
-  
+
   for (const trade of tradesToCheck) {
     const offer = await Steam.getTradeOffer(trade.apiKey, trade.steamTradeId).catch(console.error)
     if (offer && offer.trade_offer_state === 3) {

@@ -20,8 +20,7 @@
     "tradeSkinsToApp": "./node_modules/.bin/babel-node src/script/trade_skins_to_app.js",
     "steamLevel": "./node_modules/.bin/babel-node src/script/steam_level.js",
     "processRules": "./node_modules/.bin/babel-node src/script/process_rules.js",
-    "reloginFromOldPods": "./node_modules/.bin/babel-node src/script/relogin_from_old_pods.js",
-    "query": "./node_modules/.bin/babel-node src/script/query.js"
+    "reloginFromOldPods": "./node_modules/.bin/babel-node src/script/relogin_from_old_pods.js"
   },
   "dependencies": {
     "mongodb": "^3.0.10",

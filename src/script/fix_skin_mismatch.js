@@ -10,12 +10,19 @@ async function main() {
   const mongo = new Mongo({})
   await mongo.getDb()
   
-  const bots = await mongo.find('bots', { _application: Mongo.objectId(config.fixSkinMismatch.application) })
-
-  for (const bot of bots) {
-    console.log('Processing bot:', bot.login)
+  const toSkip = 0
+  const bots = await mongo.find('bots', {
+    _application: Mongo.objectId(config.fixSkinMismatch.application),
+    isActive: true
+  }, { skip: toSkip })
+  
+  for (let i = 0; i < bots.length; i++) {
+    let bot = bots[i]
+    console.log('Processing bot:', bot.login, `#${i+toSkip}`)
     const inventory = await Steam.getInventory(bot.steamId).catch(console.error)
-    const skins = await mongo.find('skins', { _bot: Mongo.objectId(bot._id), appid: { $in: [ 440, 570, 730 ] } })
+    const skins = await mongo.find('skins', {
+      _bot: Mongo.objectId(bot._id), appid: { $in: [ 440, 570, 730 ] }
+    })
     
     const offers = await Steam.getTradeOffers(bot.apiKey).catch(console.error)
     
@@ -66,7 +73,7 @@ async function main() {
         }
       }
     }
-    await Common.sleep(5000)
+    await Common.sleep(1000)
   }
   
   await mongo.close()

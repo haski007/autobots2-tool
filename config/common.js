@@ -1,8 +1,12 @@
 const config = {
   mongo: {
+    url: '',
     host: '127.0.0.1',
     port: 27017,
-    db: 'main'
+    db: '',
+    user: '',
+    password: '',
+    authDb: '',
   },
   autobots: {
     url: 'http://autobots2.devss.xyz/api/latest',

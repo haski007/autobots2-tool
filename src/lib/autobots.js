@@ -1,9 +1,10 @@
 import request from 'request'
+import config from '../../config/common'
 
 export default class Autobots {
   
   constructor({ url, apiToken }) {
-    this.url = url || 'http://autobots2.devss.xyz/api/latest'
+    this.url = url || config.autobots.url
     this.apiToken = apiToken
   }
   

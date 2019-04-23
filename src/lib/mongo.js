@@ -23,8 +23,16 @@ export default class Mongo {
   async getClient() {
     if (!this.client)
       console.log('Connecting to MongoDB with URL:', this.connectionUrl)
-      this.client = await mongo.MongoClient.connect(this.connectionUrl)
-      .catch(e => console.error('Create MongoDB client error:', e))
+      this.client = await mongo.MongoClient.connect(this.connectionUrl, {
+        keepAlive: true,
+        connectTimeoutMS: 600000,
+        socketTimeoutMS: 600000,
+        reconnectTries: 30000
+      })
+      .catch(async e => {
+        console.error('Create MongoDB client error:', e)
+        return await this.getClient()
+      })
     return this.client
   }
   
@@ -38,9 +46,19 @@ export default class Mongo {
     .catch(e => console.error('Close MongoDB client error:', e))
   }
   
-  async find(collection, criteria) {
-    return await this.db.collection(collection).find(criteria).toArray()
+  async count(collection, criteria, options) {
+    return await this.db.collection(collection).count(criteria, options)
+    .catch(e => console.error('Count in MongoDB error:', e))
+  }
+  
+  async find(collection, criteria, options) {
+    return await this.db.collection(collection).find(criteria, options).toArray()
     .catch(e => console.error('Find in MongoDB error:', e))
+  }
+  
+  async aggregate(collection, pipeline, options) {
+    return await this.db.collection(collection).aggregate(pipeline, options).toArray()
+    .catch(e => console.error('Aggregate in MongoDB error:', e))
   }
   
   async remove(collection, criteria) {
