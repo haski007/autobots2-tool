@@ -27,7 +27,8 @@ export default class Mongo {
         keepAlive: true,
         connectTimeoutMS: 600000,
         socketTimeoutMS: 600000,
-        reconnectTries: 30000
+        reconnectTries: 30000,
+        useNewUrlParser: true
       })
       .catch(async e => {
         console.error('Create MongoDB client error:', e)
@@ -47,10 +48,15 @@ export default class Mongo {
   }
   
   async count(collection, criteria, options) {
-    return await this.db.collection(collection).count(criteria, options)
+    return await this.db.collection(collection).countDocuments(criteria, options)
     .catch(e => console.error('Count in MongoDB error:', e))
   }
-  
+
+  async findOne(collection, criteria, options) {
+    return await this.db.collection(collection).findOne(criteria, options)
+        .catch(e => console.error('Find in MongoDB error:', e))
+  }
+
   async find(collection, criteria, options) {
     return await this.db.collection(collection).find(criteria, options).toArray()
     .catch(e => console.error('Find in MongoDB error:', e))

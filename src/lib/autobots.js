@@ -78,7 +78,7 @@ export default class Autobots {
       }, (error, response, body) => {
         if (error) return reject(`Create trade error:`, error)
         if (response.statusCode !== 201) return reject(`Create trade response code:`, response.statusCode)
-        resolve(JSON.parse(body).message)
+        resolve(JSON.parse(body))
       })
     })
   }
