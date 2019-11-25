@@ -8,6 +8,9 @@ const config = {
     password: '',
     authDb: '',
   },
+  redis: {
+    url: ''
+  },
   autobots: {
     url: 'http://autobots2.devss.xyz/api/latest',
   },

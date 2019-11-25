@@ -11,7 +11,9 @@ async function main() {
   await mongo.getDb()
   
   const skins = await mongo.find('skins', {
-    _trade: { $exists: false }, _application: Mongo.objectId(config.fixSkinTrade.application)
+    _trade: { $exists: false },
+    _application: Mongo.objectId(config.fixSkinTrade.application),
+    _bot:  Mongo.objectId("5b5b2c705d48a60010d79a49")
   })
   
   const skinBotMap = {}
@@ -22,13 +24,19 @@ async function main() {
 
   const tradesToCheck = []
   for (const bot in skinBotMap) {
-    console.log(typeof bot)
     const trades = await mongo.find('trades', {
-      _bot: Mongo.objectId(bot), state: 3, itemsToReceive: { $gt: []}
+      // _bot: Mongo.objectId(bot), state: 3, itemsToReceive: { $gt: []}
+      _id: { $in: [
+          Mongo.objectId('5cc4899ca3f48b000d3b8f27'),
+          Mongo.objectId('5cdef0698a561d000dac8049')
+        ]
+      }
     })
     for (const trade of trades) {
-      const tradeSkins = await mongo.count('skins', { _tradeIds: { $in: [ trade._id ] } })
-      if (trade.itemsToReceive.length !== tradeSkins.length) tradesToCheck.push(trade)
+      // const tradeSkins = await mongo.count('skins', { _tradeIds: { $in: [ trade._id ] } })
+      // console.log(tradeSkins)
+      // if (trade.itemsToReceive.length !== tradeSkins.length) tradesToCheck.push(trade)
+      tradesToCheck.push(trade)
     }
   }
 
@@ -46,28 +54,31 @@ async function main() {
       const ourSteamId = bots[0].steamId
       if (items && items.length)
         for (const item of items) {
-          const mongoItem = (await mongo.find('skins', { assetid: item.new_assetid }))[0]
-          if (!mongoItem) {
+          const mongoItems = await mongo.find('skins', { assetid: item.new_assetid })
+          if (!mongoItems || !mongoItems.length) {
             console.log('Item not found:', item.new_assetid)
-          } else {
-            console.log('Item updated:', item.new_assetid)
-            await mongo.update('skins', { appid: item.appid, assetid: item.new_assetid }, {
-              $set: { _trade: trade._id }, $addToSet: {
-                points: {
-                  assetid: item.assetid,
-                  tradeId: trade.steamTradeId,
-                  to: ourSteamId,
-                  from: steamId,
-                  toApplication: trade._application
-                }, _tradeIds: trade._id
-              }
-            }).catch(console.error)
+            continue
           }
+          await mongo.update('skins', { appid: item.appid, assetid: item.new_assetid }, {
+            $set: {
+              _trade: trade._id
+            },
+            $addToSet: {
+              points: {
+                assetid: item.assetid,
+                tradeId: trade.steamTradeId,
+                to: ourSteamId,
+                from: steamId,
+                toApplication: trade._application
+              },
+              _tradeIds: trade._id
+            }
+          }).catch(console.error)
+          console.log('Item updated:', item.new_assetid)
         }
     }
     await Common.sleep(200)
   }
-  
   await mongo.close()
   
 }

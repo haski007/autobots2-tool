@@ -4,7 +4,7 @@ import config from '../../config/common'
 export default class Mongo {
   
   constructor({ connectionUrl, dbName }) {
-    this.dbName = dbName || config.mongo.db || 'main'
+    this.dbName = dbName || config.mongo.db
     if (connectionUrl)
       this.connectionUrl = connectionUrl
     else if (config.mongo.url)

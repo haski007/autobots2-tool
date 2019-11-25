@@ -1,7 +1,6 @@
 import Mongo from '../lib/mongo'
 import Steam from '../lib/steam'
-import Common from '../lib/common'
-import config from '../../config/common'
+import Redis from "../lib/redis"
 
 main().catch(console.error)
 
@@ -10,14 +9,15 @@ async function main() {
   const mongo = new Mongo({})
   await mongo.getDb()
 
-  const trades = await mongo.find('trades', { _id: { $in: [
-        Mongo.objectId('5cc4899ca3f48b000d3b8f27'),
-        Mongo.objectId('5cdef0698a561d000dac8049')
-      ]
-  }})
+  const trades = await mongo.find('trades', {
+    state: 3,
+    _id: Mongo.objectId('5dd8fcfe7c5896000b32200f')
+  })
+  
+  console.log(trades.length)
 
   for (const trade of trades) {
-    const skins = await mongo.find('skins', { _id: trade._id })
+    const skins = await mongo.find('skins', { _trade: trade._id })
     if (skins.length && skins.length === trade.itemsToReceive) {
       console.log(`All skins from trade _id ${trade._id} are already in DB`)
       continue
@@ -42,12 +42,12 @@ async function main() {
 
     if (tradeSteam.assets_received && tradeSteam.assets_received.length) {
       for (const asset of tradeSteam.assets_received) {
-        const skin = await mongo.findOne('skins', { appid: asset.appid, assetid: asset.new_assetid })
+        const skin = await mongo.findOne('skins', { appid: asset.appid, assetid: asset.new_assetid })//, _trade: null })
         if (!skin) {
           // TODO: remove/merge
           console.log(`Not exists: ${asset.new_assetid}`)
         } else {
-          // console.log(`Exists: ${skin.assetid}`)
+          console.log(`Exists: ${skin.assetid}`)
           await mongo.update('skins', { appid: skin.appid, assetid: skin.assetid }, {
             $set: {
               _trade: trade._id
@@ -67,6 +67,14 @@ async function main() {
         }
       }
     }
+  
+    const redis = new Redis({})
+    
+    const skinsFromTrade = await mongo.find('skins', { _trade: trade._id })
+    
+    await redis.lpush('__hooks__', skinsFromTrade.map(s => "skin:" + s._id + ":0:0:0"))
+
+    redis.quit()
   }
 
   await mongo.close()
